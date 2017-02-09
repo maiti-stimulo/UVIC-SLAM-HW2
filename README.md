@@ -1,4 +1,4 @@
-# SLAM-HW2-Private
+# UVIC-SLAM-HW2
 
 ## Introduction
 
