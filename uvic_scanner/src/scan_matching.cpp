@@ -110,7 +110,8 @@ void laser_callback(const sensor_msgs::LaserScan& input) {
             //### output.KF_flag = ??
             //### output.LC_flag = ??
             //### output.scan = ??
-            //### output.D_l = ?? // don't forget to put also the covariance here.
+            //### output.D_l.pose = ??
+            //### output.D_l.covariance = ??
             //### output.coverage = ?? 
             //### output.KF_ref = ??
 
