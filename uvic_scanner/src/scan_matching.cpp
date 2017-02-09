@@ -74,6 +74,15 @@ void laser_callback(const sensor_msgs::LaserScan& input) {
 	//### Running alignment on GICP between new_pointcloud and kf_pointcloud ###
 	//### INSERT FUNCTION CALL
 
+    //### The Delta transformation between the ref scan and the input scan
+    //### INSERT RECOVERY OF THE TRANSFORMATION
+
+    //### The Delta transformation in 2D space
+    //### EXTRACT THE 2D DELTA FROM THE 3D TRANSFORM ABOVE
+
+    //### the covariance of the delta
+    //### COMPUTE THE COVARIANCE BASED ON THE FORMULAS IN THE README.md FILE
+
 	//### The fitness of the alignment between new_pointcloud and kf_pointcloud ###
 	//### converged_fitness = 0.0, means 100% match. Scale from 0.0 to 1.0.
         //### ASSIGN FITNESS VALUE OF GICP ALIGNMENT TO "converged_fitness" VARIABLE
@@ -101,6 +110,7 @@ void laser_callback(const sensor_msgs::LaserScan& input) {
             //### output.KF_flag = ??
             //### output.LC_flag = ??
             //### output.scan = ??
+            //### output.D_l = ?? // don't forget to put also the covariance here.
             //### output.coverage = ?? 
             //### output.KF_ref = ??
 
