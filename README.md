@@ -71,6 +71,12 @@ Issues a new Keyframe and collects the necessary information to be passed to the
 
 The PCL library should be installed with ROS kinetic. If not, follow installation guidelines at http://pointclouds.org/.
 
+This homework will utilize the Stage/Player simulator for ROS, called stage-ros. This should be installed by default, if not, run the following in a terminal to install the necessary packages:
+
+```
+$ sudo apt-get install ros-kinetic-stage
+```
+
 ## Homework
 
 ### `scanner` package
