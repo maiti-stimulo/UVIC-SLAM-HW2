@@ -43,17 +43,17 @@ Therefore, we will need to collect all the necessary information for these facto
   
 This functionality involves several parts of the SLAM system, and has for this reason been split into three independent ROS packages and nodes, which communicate through ROS publishers and services. These nodes are the following:
 
-### `KF_select` node
+### The `KF_select` node
 It belongs to the package `graph`.
 
 Extracts the last keyframe (`KF_last`) in the `map`, and provide it in return.
 
-### `scan_matching` node
+### The `scan_matching` node
 It belongs to the package `scanner`.
 
 Computes alignement, frame transform, and fitness of the match between the incoming scan and the scan in the reference keyframe `KF_ref`.  
 
-### `KF_issuer` node
+### The `KF_issuer` node
 It belongs to the package `graph`.
 
 Issues a new Keyframe and collects the necessary information to be passed to the graph builder:
@@ -95,7 +95,7 @@ You will of course fail to do this, because you will have to insert your code in
 
 The functionality of the scanner package is synchronous with the reception of laser data. Therefore, all the code is placed in the `laser_callback()` in the `scan_matching` node, which receives a ROS message of the type `LaserScan`. 
 
-### `scan_matching` node:
+### The `scan_matching` node:
 
 These are the duties of this node, which you have to program in the function `laser_callback()`:
 
@@ -109,13 +109,13 @@ These are the duties of this node, which you have to program in the function `la
     - Compute the total displacement `Dd = norm([Dx,Dy])`.
     - Compute the total rotation `Dth`.
     - Make the variance in position proportional to displacement, `sigma_squared_x = sigma_squared_y = k_pos_disp * Dd`.
-    - Make the variance in rotation proportional to displacement and the rotation, `sigma_squared_th = k_rot_disp * Dd + k_rot_rot * Dth`.
+    - Make the variance in rotation proportional to displacement and rotation, `sigma_squared_th = k_rot_disp * Dd + k_rot_rot * Dth`.
     - Build the covariances matrix `C_l = diag(sigma_squared_x,sigma_squared_y,sigma_squared_th)`
   - Obtain the `fitness` of the alignement or match. In PCL, the alignement is called 'registration'.
   - Based on `fitness`, determine if a new keyframe needs to be created, and set the flag `KF_flag` accordingly.
   - Finally publish a message of type `ScanToKFIssuer` with the data: `KF_flag`, `TS`, `scan`, `fitness`, `D_l` and `C_l`.
   
-### `KF_select` node
+### The `KF_select` node
 
 This node acts as a ROS service that must return the last keyframe of the SLAM graph.
   
@@ -128,7 +128,7 @@ Therefore:
   - You will need to come back to this node to write the appropriate code once the SLAM graph is available -- this should happen in HW3 or HW4.
 
 
-### `KF_issuer` node
+### The `KF_issuer` node
 
 This node collects the information to be handed to the graph builder. Again,
 
