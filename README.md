@@ -76,6 +76,20 @@ This homework will utilize the Stage/Player simulator for ROS, called stage-ros.
 ```
 $ sudo apt-get install ros-kinetic-stage
 ```
+Firstly, using a terminal "cd" into your catkin_ws or "slam_ws" from our last homework.
+```
+$ cd ~/slam_ws/src
+```
+You will retrieve the code using the following command:
+```
+$ git clone git@github.com:davidswords/UVIC-SLAM-HW2.git
+```
+And as usual compile your code using the following command:
+```
+$ cd ../
+$ catkin_make
+```
+You will of course fail to do this, because you will have to insert your code into scan_matching.cpp. There have been changes to the naming of packages and nodes since the last homework, so it should be fine for you to attempt this catkin_make with the previous homework in the same workspace. If you didn't manage to get your code working for the last homework, it would be best to simply remove it from the workspace, since an odometry solution will be provided with this one.
 
 ## Homework
 
