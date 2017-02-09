@@ -4,11 +4,7 @@
 
 This is the readme file of the second homework (HW) of the SLAM course of the UVIC robotics master.
 
-The objective of this HW is to build two ROS nodes:
-
-  - A `scan_matching` node manipulates laser scans. It is able to get a new laser scan, and to match it against another laser scan selected from the map.
-  
-  - A `KF_issuer` node receives the result of the `laser` node and decides whether it is worth creating a new keyframe for the SLAM problem or not. If so, it collects the information necessary for updating the graph.
+The objective of this HW is to complete the ROS `scan_matching`, which manipulates laser scans. The node is able to get a new laser scan, and to match it against another laser scan selected from the map. Also, based on the outcome of this matching, some key decisions can be taken.
 
 ## Related documentation
 
@@ -48,7 +44,7 @@ Therefore, we will need to collect all the necessary information for these facto
 This functionality involves several parts of the SLAM system, and has for this reason been split into three independent ROS packages and nodes, which communicate through ROS publishers and services. These nodes are the following:
 
 ### `KF_select` node
-It belongs to the packege `graph`.
+It belongs to the package `graph`.
 
 Extracts the last keyframe (`KF_last`) in the `map`, and provide it in return.
 
@@ -57,8 +53,8 @@ It belongs to the package `scanner`.
 
 Computes alignement, frame transform, and fitness of the match between the incoming scan and the scan in the reference keyframe `KF_ref`.  
 
-### `KF_issuer` package
-It belongs to the packege `graph`.
+### `KF_issuer` node
+It belongs to the package `graph`.
 
 Issues a new Keyframe and collects the necessary information to be passed to the graph builder:
   - New keyframe
@@ -73,9 +69,13 @@ The PCL library should be installed with ROS kinetic. If not, follow installatio
 
 This homework will utilize the Stage/Player simulator for ROS, called stage-ros. This should be installed by default, if not, run the following in a terminal to install the necessary packages:
 
+### Stage simulator
+
 ```
 $ sudo apt-get install ros-kinetic-stage
 ```
+
+### HW2 project
 Firstly, using a terminal "cd" into your catkin_ws or "slam_ws" from our last homework.
 ```
 $ cd ~/slam_ws/src
@@ -93,23 +93,29 @@ You will of course fail to do this, because you will have to insert your code in
 
 ## Homework
 
-### `scanner` package
+The functionality of the scanner package is synchronous with the reception of laser data. Therefore, all the code is placed in the `laser_callback()` in the `scan_matching` node, which receives a ROS message of the type `LaserScan`. 
 
-The functionality of the scanner package is synchronous with the reception of laser data. Therefore, all the code is placed in the `laser_callback()` in the `scan_matching` node, which receives a ROS message of the type `LaserScan`. Here is the sequence of operations to be performed:
+### `scan_matching` node:
 
-#### `scan_matching` node:
+These are the duties of this node, which you have to program in the function `laser_callback()`:
 
-  - Once the scan is acquired, we need to transform it into a suitable format for PCL, `pcl::PointXYZ`. <-- done
-  - A reference scan must be queried to the node `KF_select` through a ROS service. 
-  - The reference scan also needs to be converted to PCL format `pcl::PointXYZ`. <-- done.
+  - Once the arriving scan is acquired, we need to transform it into a suitable format for PCL, `pcl::PointXYZ`. <-- this is already done.
+  - A reference keyframe must be queried from the node `KF_select` through a ROS service.  <-- this is already done.
+  - The reference scan contained in the reference keyframe also needs to be converted to PCL format `pcl::PointXYZ`. <-- this is already done.
   - A call to the ICP algorithm in the PCL library will be used to align both scans. This is done through one of the available algorithms in PCL, for example: `pcl::GeneralizedIterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ>`.
-  - The result is a frame transform between the scans, which is due to robot motion: `D_l`. 
-  - Determine the covariances matrix of this frame transform, `C_l`.
-  - Compute the `fitness` of the alignement or match. In PCL, the alignement is called 'registration'.
+  - As the result of this matching, we need to obtain the frame transform between the scans, which is due to robot motion: `D_l`. 
+  - Since the algorithm computes 3D transformations in the form of an homogeneous 4x4 matrix `H=[R T;0 1]`, we need to extract the pertinent 2D values to build `D_l = [Dx, Dy, Dth]`.
+  - Determine the covariances matrix of this frame transform, `C_l`. For this:
+    - Compute the total displacement `Dd = norm([Dx,Dy])`.
+    - Compute the total rotation `Dth`.
+    - Make the variance in position proportional to displacement, `sigma_squared_x = sigma_squared_y = k_pos_disp * Dd`.
+    - Make the variance in rotation proportional to displacement and the rotation, `sigma_squared_th = k_rot_disp * Dd + k_rot_rot * Dth`.
+    - Build the covariances matrix `C_l = diag(sigma_squared_x,sigma_squared_y,sigma_squared_th)`
+  - Obtain the `fitness` of the alignement or match. In PCL, the alignement is called 'registration'.
   - Based on `fitness`, determine if a new keyframe needs to be created, and set the flag `KF_flag` accordingly.
   - Finally publish a message of type `ScanToKFIssuer` with the data: `KF_flag`, `TS`, `scan`, `fitness`, `D_l` and `C_l`.
   
-#### `KF_select` node
+### `KF_select` node
 
 This node acts as a ROS service that must return the last keyframe of the SLAM graph.
   
@@ -123,6 +129,14 @@ Therefore:
 
 
 ### `KF_issuer` node
+
+This node collects the information to be handed to the graph builder. Again,
+
+  - **You do not need to edit this node during the current HW2**.
+
+  - You will need to come back to this node to write the appropriate code once the SLAM graph is available -- this should happen in HW3 or HW4.
+  
+The desired operation of this node is however detailed below:
 
 At the reception of the result of the `laser` node, do
 
