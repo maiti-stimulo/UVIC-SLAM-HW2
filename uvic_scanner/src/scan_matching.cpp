@@ -122,7 +122,7 @@ void laser_callback(const sensor_msgs::LaserScan& input)
                         //### output.scan = ??
                         //### output.D_l.pose = ??
                         //### output.D_l.covariance = ??
-                        //### output.coverage = ??
+                        //### output.fitness = ??
                         //### output.KF_ref = ??
 
                         //### Publishing of GICP result to KF_issuer msg ###
@@ -142,7 +142,7 @@ void laser_callback(const sensor_msgs::LaserScan& input)
                         //### output.scan = ??
                         //### output.D_l.pose = ??
                         //### output.D_l.covariance = ??
-                        //### output.coverage = ??
+                        //### output.fitness = ??
                         //### output.KF_ref = ??
 
                         //### Publishing of GICP result to KF_issuer msg ###
