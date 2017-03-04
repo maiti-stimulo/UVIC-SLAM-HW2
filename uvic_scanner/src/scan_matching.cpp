@@ -97,25 +97,17 @@ void laser_callback(const sensor_msgs::LaserScan& input) {
         pcl::PointCloud<pcl::PointXYZ>::Ptr new_pointcloud = pointcloud_format_correction(new_scan_srv.response.pointcloud);
 	//### Receiving of keyframe scan converted into a pointcloud ###
         pcl::PointCloud<pcl::PointXYZ>::Ptr kf_pointcloud = pointcloud_format_correction(kf_scan_srv.response.pointcloud);
-
 	//### Initialization of Generalized Interative Closest Point from PCL ###
 	//### INSERT INITIALIZATION CALL of type <pcl::PointXYZ, pcl::PointXYZ>
         pcl::GeneralizedIterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> gicp;
-
 	//### Setting the input for GICP as the new_pointcloud ###
-        //### INSERT FUNCTION CALL HERE
         gicp.setInputSource(new_pointcloud);
-
-	//### Setting the output for GICP as the kf_pointcloud ###
-        //### INSERT FUNCTION CALL HERE
+	//### Setting the output for GICP as the kf_pointcloud ##
         gicp.setInputTarget(kf_pointcloud);
-
 	//### A target for the converged pointcloud of new_pointcloud and kf_pointcloud ###
         //### INSERT POINTER INITIALIZATION of form pcl::PointCloud<pcl::PointXYZ>
         pcl::PointCloud<pcl::PointXYZ>::Ptr new_converged_PointCloud(new pcl::PointCloud<pcl::PointXYZ>);
-
 	//### Running alignment on GICP between new_pointcloud and kf_pointcloud ###
-        //### INSERT FUNCTION CALL HERE
         gicp.align(*new_converged_PointCloud);
 
 	//### Get the fitness score of the alignment from the GICP object
@@ -123,11 +115,9 @@ void laser_callback(const sensor_msgs::LaserScan& input) {
   //### converged_fitness = 0.0, means 100% match. Scale from 0.0 to 1.0.
 	//### INSERT FUNCTION CALL HERE assigned to "double converged_fitness"
 	      double converged_fitness = gicp.getFitnessScore();
-
 	//### Get the boolean indicate whether the two scans (pointclouds) converged
 	//### INSERT FUNCTION CALL HERE assigned to "bool converged"
         bool converged = gicp.hasConverged();
-
 	//### Get the matrix transform between the two scans (pointclouds)
 	//### INSERT FUNCTION CALL assigned to variable of type Eigen::Matrix4f
 	      Eigen::Matrix4f Matrix_Result = gicp.getFinalTransformation();
@@ -138,9 +128,9 @@ void laser_callback(const sensor_msgs::LaserScan& input) {
 	  //### The Delta transformation between the ref scan and the input scan
 	  //### Translate the above "Eigen::Matrix4f transform" into Dx, Dy, Dth
 	  //### Indicating the difference in x, y and rotation between scans
-          //double Dx = transform( ? , ?);
-          //double Dy = transform( ?, ?);
-          //double Dth = atan2( transform( ?, ?), transform( ?, ?) );
+          double Dx = transform( 0 , 3);
+          double Dy = transform( 1, 3);
+          double Dth = atan2( transform( 1, 0), transform( 0, 0) ); // no entenc aquest valors de la transformada
 
 	  //### The Delta transformation in 2D space
           //### EXTRACT THE 2D DELTA FROM THE 3D TRANSFORM ABOVE
@@ -205,7 +195,8 @@ int main(int argc, char **argv) {
 
   ros::Subscriber laser_sub = n.subscribe("/base_scan", 50, laser_callback);
   scan_matching_kf_issuer_pub = n.advertise<uvic_msgs::SMToKFI>("/scanner/scan_matching_kf_issuer", 50);
-
+  //In this application all user callbacks will be called from within the ros::spin() call.
+  //ros::spin() will not return until the node has been shutdown, either through a call to ros::shutdown() or a Ctrl-C.
   ros::spin();
 
   return 0;
